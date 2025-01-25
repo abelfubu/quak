@@ -12,9 +12,10 @@
   "app": {
     "windows": [
       {
-        "title": "quak",
+        "title": "Quak",
         "width": 800,
-        "height": 600,
+        "height": 800,
+        "fullscreen": false,
         "decorations": false,
         "transparent": true,
         "shadow": true,

@@ -11,15 +11,9 @@
   -webkit-text-size-adjust: 100%;
 }
 
-main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-radius: 0.5rem;
-}
-
-input {
-  background-color: #0f0f0f;
-  font-size: 1.8rem;
-  color: #f6f6f6;
+html {
+  background-color: #010101;
+  border-radius: 2rem;
+  overflow: hidden;
+  padding: 1rem;
 }
