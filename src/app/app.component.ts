@@ -41,8 +41,8 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 export class AppComponent {
   protected readonly tabs = [
     { title: 'Raindrops', path: '/' },
-    { title: 'Settings', path: '/setup' },
     { title: 'Work Items', path: '/work-items' },
+    { title: 'Settings', path: '/setup' },
   ].map((t) => ({ ...t, id: crypto.randomUUID() }))
 
   constructor() {

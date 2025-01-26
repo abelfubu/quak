@@ -20,6 +20,15 @@ import { KbdComponent } from '../../libs/ui/kbd/kbd.component'
         type="password"
         class="bg-gray-800 p-2 rounded-t-md text-white w-full outline-0"
       />
+
+      <label for="azurePAT" class="text-blue-200">Azure PAT</label>
+      <input
+        formControlName="azurePAT"
+        placeholder="Token goes here ..."
+        id="azurePAT"
+        type="password"
+        class="bg-gray-800 p-2 rounded-t-md text-white w-full outline-0"
+      />
     </form>
 
     <div class="flex gap-4">
@@ -61,6 +70,7 @@ export class SetupComponent {
     raindropToken: new FormControl<string>(
       this.settings.get('raindropToken') || '',
     ),
+    azurePAT: new FormControl<string>(this.settings.get('azurePAT') || ''),
   })
 
   cancel() {
@@ -69,6 +79,7 @@ export class SetupComponent {
 
   save() {
     this.settings.set('raindropToken', this.form.value.raindropToken || '')
+    this.settings.set('azurePAT', this.form.value.azurePAT || '')
     this.router.navigate(['/'])
   }
 }

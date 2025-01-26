@@ -7,6 +7,12 @@
   },
   "projects": {
     "quak": {
+      "schematics": {
+        "@schematics/angular:component": {
+          "inlineStyle": true,
+          "inlineTemplate": true
+        }
+      },
       "projectType": "application",
       "root": "",
       "sourceRoot": "src",
