@@ -50,7 +50,9 @@ import { RaindropService } from '../../raindrop.service'
             <ng-icon name="heroGlobeAlt" />
             <h3>{{ raindrop.title }}</h3>
           </div>
-          <p class="text-[#9CABBA] truncate">{{ raindrop.description }}</p>
+          <p class="text-[#9CABBA] truncate">
+            {{ raindrop.description }}
+          </p>
         </li>
       }
     </ul>

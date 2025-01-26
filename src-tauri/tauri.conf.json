@@ -20,8 +20,9 @@
         "transparent": true,
         "shadow": true,
         "focus": true,
-        "alwaysOnTop": false,
-        "center": true
+        "alwaysOnTop": true,
+        "center": true,
+        "skipTaskbar": false
       }
     ],
     "security": {

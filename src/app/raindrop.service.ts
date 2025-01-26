@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { load } from '@tauri-apps/plugin-store'
 import { catchError, from, map, Observable, of, switchMap, tap } from 'rxjs'
 import { Raindrop } from './models/raindrop.model'
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
-import { openUrl } from '@tauri-apps/plugin-opener'
 
 interface RaindropResponse {
   items: Raindrop[]
@@ -38,8 +38,10 @@ export class RaindropService {
                 id: _id,
                 title: title,
                 description: link,
-                action: () =>
-                  openUrl(link).then(() => getCurrentWebviewWindow().hide()),
+                action: async () => {
+                  await openUrl(link)
+                  await getCurrentWebviewWindow().hide()
+                },
               })),
             ),
           )
