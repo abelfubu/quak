@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  effect,
   ElementRef,
   inject,
   signal,
@@ -11,46 +12,43 @@ import { Router } from '@angular/router'
 import { NgIcon, provideIcons } from '@ng-icons/core'
 import { heroGlobeAlt, heroMagnifyingGlass } from '@ng-icons/heroicons/outline'
 import { listen } from '@tauri-apps/api/event'
-import { load } from '@tauri-apps/plugin-store'
-import { RaindropService } from '../../raindrop.service'
+
+import { RaindropService } from './raindrop.service'
 
 @Component({
   selector: 'app-raindrop',
   imports: [NgIcon],
   viewProviders: [provideIcons({ heroMagnifyingGlass, heroGlobeAlt })],
   template: `
-    <div class="flex items-center justify-center h-16 text-white">
-      <ng-icon
-        name="heroMagnifyingGlass"
-        color="#9CABBA"
-        size="24"
-        class="mt-4"
-      />
+    <div class="flex items-center text-white">
+      <ng-icon name="heroMagnifyingGlass" color="#fff" size="24" />
 
-      <div class="flex-col flex-grow">
-        <small class="ml-1">Search</small>
-        <input
-          autofocus
-          #queryInput
-          class="pb-3 px-2 rounded-t-md text-xl text-white w-full outline-0"
-          (input)="query.set(queryInput.value)"
-          (keyup.Enter)="accept()"
-          (keyup.ArrowDown)="down()"
-          (keyup.ArrowUp)="up()"
-        />
-      </div>
+      <input
+        #queryInput
+        class="pb-3 px-2 text-xl text-white w-full outline-0 mt-2"
+        [value]="query()"
+        (input)="[query.set(queryInput.value), currentIndex.set(0)]"
+        (keyup.Enter)="accept()"
+        (keyup.ArrowDown)="[$event.preventDefault(), down()]"
+        (keyup.ArrowUp)="[$event.preventDefault(), up()]"
+      />
     </div>
 
-    <ul class="z-5 mt-2">
+    <ul class="mt-1">
       @for (raindrop of raindrops(); track raindrop.id) {
         @let selected = $index === currentIndex();
 
-        <li class="p-2 text-white rounded-lg" [class.selected]="selected">
+        <li
+          class="p-2 text-white rounded-lg cursor-pointer"
+          [class.selected]="selected"
+          (click)="[raindrop.action(), reset()]"
+          (mouseenter)="currentIndex.set($index)"
+        >
           <div class="flex gap-1 items-center">
             <ng-icon name="heroGlobeAlt" />
             <h3>{{ raindrop.title }}</h3>
           </div>
-          <p class="text-[#9CABBA] truncate">
+          <p class="text-[var(--text)] truncate">
             {{ raindrop.description }}
           </p>
         </li>
@@ -59,10 +57,10 @@ import { RaindropService } from '../../raindrop.service'
   `,
   styles: `
     .selected {
-      background-color: #16202b;
+      background-color: var(--bg-primary);
 
       h3 {
-        color: #55ddff;
+        color: var(--accent);
       }
     }
   `,
@@ -77,6 +75,8 @@ export class RaindropComponent {
       this.input()?.nativeElement.focus()
     })
   }
+
+  focusEffect = effect(() => this.input()?.nativeElement.focus())
 
   readonly query = signal('')
   readonly currentIndex = signal(0)
@@ -99,29 +99,26 @@ export class RaindropComponent {
       .slice(0, 11),
   )
 
-  async accept() {
-    if (this.query().split(' ')[0] === 'token') {
-      const store = await load('store.json', { autoSave: false })
-      await store.set('raindrop-token', { value: this.query().split(' ')[1] })
-      await store.save()
-      return
-    }
-
+  async accept(): Promise<void> {
     if (!this.raindrops().length) return
 
     this.raindrops()[this.currentIndex()].action()
+    this.reset()
   }
 
-  down() {
-    console.log('CURRENT', this.currentIndex())
+  down(): void {
     this.currentIndex.update((i) =>
       Math.min(i + 1, this.raindrops().length - 1),
     )
-    console.log('AFTER', this.currentIndex())
   }
 
-  up() {
+  up(): void {
     this.currentIndex.update((i) => Math.max(i - 1, 0))
+  }
+
+  reset(): void {
+    this.query.set('')
+    this.currentIndex.set(0)
   }
 }
 

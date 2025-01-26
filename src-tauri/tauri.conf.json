@@ -18,11 +18,11 @@
         "fullscreen": false,
         "decorations": false,
         "transparent": true,
-        "shadow": true,
+        "shadow": false,
         "focus": true,
         "alwaysOnTop": true,
         "center": true,
-        "skipTaskbar": false
+        "skipTaskbar": true
       }
     ],
     "security": {

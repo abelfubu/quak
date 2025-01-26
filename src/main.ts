@@ -8,10 +8,6 @@ register('CommandOrControl+Shift+R', async (event) => {
   try {
     if (event.state === 'Released') {
       const window = getCurrentWebviewWindow()
-
-      await window.setAlwaysOnTop(true)
-      await window.setDecorations(false)
-
       await window.show()
       await window.setFocus()
     }

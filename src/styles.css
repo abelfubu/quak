@@ -11,11 +11,12 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  --text: #9cabba;
+  --bg-primary: #16202b;
+  --accent: #55ddff;
 }
 
-html {
-  background-color: #010101;
-  border-radius: 1rem;
+body {
   overflow: hidden;
-  padding: 1rem;
 }
