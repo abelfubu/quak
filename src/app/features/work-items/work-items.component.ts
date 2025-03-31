@@ -11,7 +11,7 @@ import { WorkItemsService } from './work-items.service'
       #search
       (down)="list.down()"
       (up)="list.up()"
-      (enter)="[list.triggerSelectedAction(), search.query.set('')]"
+      (keyChange)="list.handleKeys($event)"
     />
 
     <app-quak-list

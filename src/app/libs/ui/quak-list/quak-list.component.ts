@@ -6,27 +6,32 @@ import {
   linkedSignal,
   output,
 } from '@angular/core'
-import { Router } from '@angular/router'
+import { listen } from '@tauri-apps/api/event'
 import { Fzf } from 'fzf'
 import { QuakItem } from 'src/app/core/models/quak-item.model'
+import { NAVIGATION_ITEMS } from 'src/app/core/tokens/navigation-items.token'
+import { KbdActionsComponent } from '../kbd-actions/bbd-actions.component'
 
 @Component({
   selector: 'app-quak-list',
+  imports: [KbdActionsComponent],
   template: `
     <ul class="mt-1">
       @for (item of data(); track item.id) {
         @let selected = $index === currentIndex();
 
         <li
-          class="p-2 text-white rounded-lg cursor-pointer"
+          class="p-2 text-white rounded-lg cursor-pointer relative"
           [class.selected]="selected"
-          (click)="[item.action(), currentIndex.set(0), clicked.emit()]"
-          (mouseenter)="currentIndex.set($index)"
         >
           <h3 class="truncate">{{ item.title }}</h3>
-          <p class="text-[var(--text)] truncate">
+          <p class="text-[var(--text)] truncate grayscale">
             {{ item.description }}
           </p>
+
+          @if (selected) {
+            <app-kbd-actions [actions]="item.actions" />
+          }
         </li>
       }
     </ul>
@@ -42,38 +47,23 @@ import { QuakItem } from 'src/app/core/models/quak-item.model'
   `,
 })
 export class QuakListComponent {
-  private readonly router = inject(Router)
-
-  private readonly staticItems = [
-    {
-      title: 'Raindrops',
-      description: 'Go to Raindrops',
-      action: () => this.router.navigate(['/']),
-      id: crypto.getRandomValues(new Uint32Array(1)).at(0)!,
-    },
-    {
-      title: 'Work Items',
-      description: 'Go to Azure work items',
-      action: () => this.router.navigate(['work-items']),
-      id: crypto.getRandomValues(new Uint32Array(1)).at(0)!,
-    },
-    {
-      title: 'Setup',
-      description: 'Go to the setup page',
-      action: () => this.router.navigate(['setup']),
-      id: crypto.getRandomValues(new Uint32Array(1)).at(0)!,
-    },
-  ]
+  private readonly navigationItems = inject(NAVIGATION_ITEMS)
 
   readonly items = input.required({
     transform: (items: QuakItem[]) =>
-      new Fzf(items.concat(this.staticItems), {
+      new Fzf(items.concat(this.navigationItems), {
         normalize: true,
         selector: (item) => item.title + item.description,
       }),
   })
 
   readonly searchTerm = input.required<string>()
+
+  constructor() {
+    listen('tauri://focus', () => {
+      this.currentIndex.set(0)
+    })
+  }
 
   readonly startingPoint = linkedSignal({
     source: this.searchTerm,
@@ -94,11 +84,6 @@ export class QuakListComponent {
   readonly data = computed(() =>
     this.filtered().slice(this.startingPoint(), this.startingPoint() + 9),
   )
-
-  triggerSelectedAction(): void {
-    this.filtered()[this.currentIndex()].action()
-    this.currentIndex.set(0)
-  }
 
   down(): void {
     if (
@@ -129,5 +114,21 @@ export class QuakListComponent {
     }
 
     this.startingPoint.update((i) => i - 1)
+  }
+
+  handleKeys(event: KeyboardEvent): void {
+    const selected = this.getSelectedItem()
+
+    const found = (selected?.actions || []).find(
+      ({ key, ctrl }) => key === event.key && ctrl === event.ctrlKey,
+    )
+
+    if (found) {
+      found.action()
+    }
+  }
+
+  private getSelectedItem(): QuakItem {
+    return this.data()[this.currentIndex()]
   }
 }

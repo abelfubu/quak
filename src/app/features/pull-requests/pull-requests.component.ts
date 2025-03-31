@@ -1,13 +1,11 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, input } from '@angular/core'
 import { rxResource } from '@angular/core/rxjs-interop'
-
 import { QuakListComponent } from 'src/app/libs/ui/quak-list/quak-list.component'
 import { QuakSearchComponent } from 'src/app/libs/ui/quak-search/quak-search.component'
-import { RaindropService } from './raindrop.service'
+import { PullRequestsService } from './pull-requests.service'
 
 @Component({
-  selector: 'app-raindrop',
-  imports: [QuakListComponent, QuakSearchComponent],
+  selector: 'app-pull-requests',
   template: `
     <app-quak-search
       #search
@@ -23,11 +21,14 @@ import { RaindropService } from './raindrop.service'
       (clicked)="search.query.set('')"
     />
   `,
+  imports: [QuakSearchComponent, QuakListComponent],
 })
-export class RaindropComponent {
-  private readonly raindrop = inject(RaindropService)
+export class PullRequestsComponent {
+  private readonly service = inject(PullRequestsService)
+  readonly repo = input.required<string>()
 
-  data = rxResource({
-    loader: () => this.raindrop.getRaindrops(),
+  readonly data = rxResource({
+    request: this.repo,
+    loader: ({ request }) => this.service.getPullRequests(request),
   })
 }

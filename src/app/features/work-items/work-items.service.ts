@@ -22,8 +22,7 @@ export class WorkItemsService {
       .post<{ workItems: { id: number }[] }>(
         'https://wkeuds.visualstudio.com/_apis/wit/wiql?api-version=5',
         {
-          // query: `SELECT * FROM WorkItems WHERE [System.ChangedDate] >= @Today - 60 AND [System.AssignedTo] = @Me AND [System.NodeName] IN ('Krypton Team', 'Atalaya Team', 'Eternia Team', 'Castillo Grayskull', 'Estación Zeta') AND [System.WorkItemType] IN ('Task', 'User Story', 'Bug', 'Defect')`,
-          query: `SELECT * FROM WorkItems WHERE [System.ChangedDate] >= @Today - 60 AND [System.State] != "Removed" AND [System.NodeName] IN ('Krypton Team', 'Atalaya Team', 'Eternia Team', 'Castillo Grayskull', 'Estación Zeta') AND [System.WorkItemType] IN ('Task', 'User Story', 'Bug', 'Defect')`,
+          query: `SELECT * FROM WorkItems WHERE [System.ChangedDate] >= @Today - 60 AND [System.State] != "Removed" AND [System.NodeName] IN ('Krypton Team', 'Atalaya Team', 'Eternia Team', 'Castillo Grayskull', 'Estación Zeta') AND [System.WorkItemType] IN ('Task', 'User Story', 'Bug', 'Defect') ORDER BY [System.ChangedDate] DESC`,
         },
         { headers },
       )
@@ -61,7 +60,6 @@ export class WorkItemsService {
         map((response) =>
           response.flatMap((res) => res.value.map(workItemAdapter)),
         ),
-        tap(console.log),
         catchError((error) => {
           console.log(error)
           return of([])

@@ -4,7 +4,7 @@ import { Component } from '@angular/core'
   selector: 'kbd[app-kbd]',
   host: {
     class:
-      'text-gray-500 border h-5 w-5 rounded-[2px] flex items-center justify-center',
+      'text-gray-500 h-5 w-5 rounded-[2px] flex items-center justify-center bg-[#fff1]',
   },
   template: ` <ng-content /> `,
 })

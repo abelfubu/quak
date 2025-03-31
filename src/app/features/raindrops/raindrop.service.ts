@@ -1,11 +1,10 @@
 import { HttpClient } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { catchError, map, Observable, of } from 'rxjs'
 import { QuakItem } from '../../core/models/quak-item.model'
 import { SettingsService } from '../../core/settings/settings.service'
-import { Raindrop } from '../../models/raindrop.model'
+import { raindropAdapter } from './adapters/raindrop.adapter'
+import { Raindrop } from './models/raindrop.model'
 
 interface RaindropResponse {
   items: Raindrop[]
@@ -26,21 +25,11 @@ export class RaindropService {
         },
       })
       .pipe(
-        map(({ items }) =>
-          items.map(({ _id, title, link }) => ({
-            id: _id,
-            title: title,
-            description: link,
-            action: async () => {
-              await openUrl(link)
-              await getCurrentWebviewWindow().hide()
-            },
-          }))
-        ),
+        map(({ items }) => items.map(raindropAdapter)),
         catchError((error) => {
           console.log(error)
           return of([])
-        })
+        }),
       )
   }
 }
